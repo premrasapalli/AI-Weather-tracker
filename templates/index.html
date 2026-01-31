@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colorful Weather App</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: rgb(57, 7, 107); /* Light gray background color */
+        }
+
+        .container {
+            background-color: #ffffff; /* White container background color */
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 60px; /* Adjusted to make space for the fixed Navbar */
+        }
+
+        .navbar {
+            background-color: #007bff; /* Blue Navbar color */
+        }
+
+        .navbar-brand {
+            color: #ffffff; /* White text color for Navbar brand */
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-fixed-top navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="#">
+            <img src="https://storage.googleapis.com/bkt-static-tt/logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
+             TechTrapture Weather App
+        </a>
+    </nav>
+
+    <div class="container mt-5">
+        <h1 class="mb-4 text-primary">Weather App</h1>
+        <form method="post">
+            <div class="form-group">
+                <label for="city">Enter city name:</label>
+                <input type="text" class="form-control" id="city" name="city" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Get Weather</button>
+        </form>
+        
+        {% if weather_data %}
+            <div class="mt-4">
+                <h2>Weather in {{ weather_data['name'] }}, {{ weather_data['sys']['country'] }}:</h2>
+                <p>Description: {{ weather_data['weather'][0]['description'] }}</p>
+                <p>Temperature: {{ weather_data['main']['temp'] }}°C</p>
+                <p>Humidity: {{ weather_data['main']['humidity'] }}%</p>
+                <p>Wind Speed: {{ weather_data['wind']['speed'] }} m/s</p>
+            </div>
+        {% else %}
+            <p class="mt-4">Weather data unavailable.</p>
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+</body>
+</html>
