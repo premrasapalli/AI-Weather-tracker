@@ -1,0 +1,17 @@
+services:
+  app:
+    build: .
+    image: ai-weather-tracker:latest
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+      SECRET_KEY: "${SECRET_KEY:-change-me}"
+      LLM_ENABLED: "${LLM_ENABLED:-false}"
+      LLM_API_KEY: "${LLM_API_KEY:-}"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8080/city/Delhi', timeout=5).status==200 else 1)"]
+      interval: 60s
+      timeout: 10s
+      retries: 3

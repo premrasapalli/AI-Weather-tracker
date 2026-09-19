@@ -1,66 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Colorful Weather App</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-    <style>
-        body {
-            background-color: rgb(57, 7, 107); /* Light gray background color */
-        }
-
-        .container {
-            background-color: #ffffff; /* White container background color */
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-top: 60px; /* Adjusted to make space for the fixed Navbar */
-        }
-
-        .navbar {
-            background-color: #007bff; /* Blue Navbar color */
-        }
-
-        .navbar-brand {
-            color: #ffffff; /* White text color for Navbar brand */
-        }
-    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ app_name }} — Live AI Weather Intelligence for India</title>
+    <meta name="description" content="Live AI-powered weather tracker for Indian cities — temperature, air quality, alerts and AI insights." />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌤</text></svg>" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="/static/css/style.css" />
 </head>
-<body>
-    <nav class="navbar navbar-fixed-top navbar-expand-lg navbar-dark bg-primary">
-        <a class="navbar-brand" href="#">
-            <img src="https://storage.googleapis.com/bkt-static-tt/logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
-             TechTrapture Weather App
-        </a>
-    </nav>
-
-    <div class="container mt-5">
-        <h1 class="mb-4 text-primary">Weather App</h1>
-        <form method="post">
-            <div class="form-group">
-                <label for="city">Enter city name:</label>
-                <input type="text" class="form-control" id="city" name="city" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Get Weather</button>
+<body class="app-body">
+  <nav class="navbar navbar-expand-lg navbar-dark brand-nav shadow-sm sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+        <span class="brand-icon">🌤</span>
+        <span class="fw-bold">{{ app_name }}</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navmenu">
+        <form class="d-flex ms-auto gap-2" role="search" onsubmit="return false;">
+          <input id="city-input" class="form-control search-input" type="search"
+                 placeholder="Search any Indian city…  e.g. Delhi, Bengaluru" autocomplete="off" />
+          <button class="btn btn-light" id="search-btn" type="button"><i class="bi bi-search"></i></button>
         </form>
-        
-        {% if weather_data %}
-            <div class="mt-4">
-                <h2>Weather in {{ weather_data['name'] }}, {{ weather_data['sys']['country'] }}:</h2>
-                <p>Description: {{ weather_data['weather'][0]['description'] }}</p>
-                <p>Temperature: {{ weather_data['main']['temp'] }}°C</p>
-                <p>Humidity: {{ weather_data['main']['humidity'] }}%</p>
-                <p>Wind Speed: {{ weather_data['wind']['speed'] }} m/s</p>
-            </div>
-        {% else %}
-            <p class="mt-4">Weather data unavailable.</p>
-        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-4">
+    <header class="d-flex flex-wrap align-items-center justify-content-between mb-3">
+      <div>
+        <h1 class="h3 mb-1 fw-bold" id="city-title">Delhi</h1>
+        <span class="text-secondary small" id="city-sub">National Capital Territory · India</span>
+      </div>
+      <div class="text-md-end">
+        <div class="badge live-badge mb-1"><span class="live-dot"></span> LIVE</div>
+        <div class="small text-secondary" id="clock"></div>
+        <div class="small text-secondary" id="upd-time"></div>
+      </div>
+    </header>
+
+    <div id="loader" class="text-center py-5">
+      <div class="spinner-border text-light" role="status"></div>
+      <div class="mt-2 text-secondary">Fetching live satellite-derived weather & AI analysis…</div>
     </div>
 
-    <!-- Bootstrap JS and Popper.js -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <div id="error-box" class="alert alert-danger d-none" role="alert"></div>
+
+    <div id="dash" class="d-none">
+      <!-- Current conditions -->
+      <div class="row g-3 mb-3">
+        <div class="col-lg-3 col-md-6">
+          <div class="card weather-card h-100">
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="text-secondary small text-uppercase">Now</div>
+                  <div class="temp-big" id="c-temp">--°C</div>
+                </div>
+                <span class="weather-emoji" id="c-icon"></span>
+              </div>
+              <div class="text-secondary" id="c-desc">--</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <div class="card weather-card h-100">
+            <div class="card-body">
+              <div class="stat-label"><i class="bi bi-thermometer-half"></i> Feels like</div>
+              <div class="stat-big" id="c-feels">--°C</div>
+              <div class="stat-mini">Humidity <span id="c-humidity">--</span>% · Pressure <span id="c-pressure">--</span> hPa</div>
+              <div class="stat-mini">Wind <span id="c-wind">--</span> km/h · Cloud <span id="c-cloud">--</span>%</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <div class="card weather-card h-100 border-0" id="aqi-card">
+            <div class="card-body">
+              <div class="stat-label"><i class="bi bi-wind"></i> Air Quality Index</div>
+              <div class="stat-big" id="aqi-value" style="color:var(--aqi-color,#adb5bd)">--</div>
+              <div class="badge aqi-badge" id="aqi-level">--</div>
+              <div class="stat-mini mt-1">Drivers: <span id="aqi-drivers">--</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <div class="card weather-card h-100">
+            <div class="card-body">
+              <div class="stat-label"><i class="bi bi-calendar-week"></i> Today's range</div>
+              <div class="stat-big" id="today-range">--</div>
+              <div class="stat-mini"><i class="bi bi-sunrise"></i> <span id="today-sunrise">--</span></div>
+              <div class="stat-mini"><i class="bi bi-sunset"></i> <span id="today-sunset">--</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alerts -->
+      <div class="mb-3" id="alerts-wrap" hidden></div>
+
+      <!-- Hourly + AQI + AI briefing row -->
+      <div class="row g-3 mb-3">
+        <div class="col-lg-8">
+          <div class="card weather-card h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="stat-label">Next 24 hours</div>
+                <span class="badge text-bg-dark">°C</span>
+              </div>
+              <div class="hourly-scroll">
+                <div class="d-flex" id="hourly-row"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card weather-card h-100">
+            <div class="card-body">
+              <div class="stat-label mb-2"><i class="bi bi-stars"></i> AI Briefing</div>
+              <p id="ai-brief" class="brief-text mb-3"></p>
+              <button class="btn btn-sm btn-outline-light" id="refresh-btn"><i class="bi bi-arrow-clockwise"></i> Refresh AI analysis</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7-day forecast -->
+      <div class="mb-4">
+        <h2 class="h5 mb-2 fw-bold">7-day forecast</h2>
+        <div class="row g-2" id="daily-row"></div>
+      </div>
+
+      <!-- Assistant -->
+      <section class="card weather-card mb-4">
+        <div class="card-body">
+          <h2 class="h5 mb-3 fw-bold"><i class="bi bi-robot"></i> AI Assistant — ask about this city</h2>
+          <div id="chat-log" class="chat-log mb-3"></div>
+          <div class="input-group">
+            <input id="chat-input" class="form-control" placeholder="e.g. Will it rain tomorrow? Should I go jogging?" autocomplete="off" />
+            <button class="btn btn-accent" id="chat-send"><i class="bi bi-send"></i></button>
+          </div>
+          <div class="form-text text-secondary mt-1">
+            <span id="llm-badge"></span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Featured cities -->
+    <section class="mb-4" id="featured-wrap">
+      <h2 class="h5 mb-2 fw-bold">Track India's major cities</h2>
+      <div class="d-flex flex-wrap gap-2" id="featured-chips">
+        <span class="text-secondary">Loading…</span>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer text-center text-secondary py-4">
+    <div class="small">
+      {{ app_name }} · Live data from Open-Meteo (free) · AI analytics engine<br/>
+      © {{ year }} — Real-time weather intelligence for India
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const INITIAL_CITY = {{ (initial_city or 'Delhi')|tojson }};
+    const FEATURED = {{ featured|default([])|tojson }};
+  </script>
+  <script src="/static/js/app.js"></script>
 </body>
 </html>
