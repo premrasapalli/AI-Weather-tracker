@@ -114,7 +114,7 @@
 .chat-log { max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
 .chat-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.9rem; }
 .chat-user { align-self: flex-end; background: linear-gradient(90deg, var(--accent), var(--accent-2)); color: var(--black); font-weight: 600; }
-.chat-ai { align-self: flex-start; background: rgba(255,136,0,.08); border: 1px solid var(--card-border); }
+.chat-ai { align-self: flex-start; background: rgba(255,136,0,.08); border: 1px solid var(--card-border); color: #c8f7d8; }
 #chat-send { background: var(--orange) !important; color: var(--black) !important; border: none; font-weight: 700; }
 #chat-input { background: rgba(255,255,255,0.06); border: 1px solid var(--card-border); color: var(--text-main); }
 #chat-input:focus { border-color: var(--orange); box-shadow: 0 0 0 0.15rem rgba(255,136,0,.25); background: rgba(255,136,0,.06); }
