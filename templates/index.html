@@ -21,11 +21,14 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navmenu">
-        <form class="d-flex ms-auto gap-2" role="search" onsubmit="return false;">
-          <input id="city-input" class="form-control search-input" type="search"
-                 placeholder="Search any Indian city…  e.g. Delhi, Bengaluru" autocomplete="off" />
-          <button class="btn btn-light" id="search-btn" type="button"><i class="bi bi-search"></i></button>
-        </form>
+        <div class="ms-auto position-relative" style="width:min(340px,90vw)">
+          <form class="d-flex gap-2" role="search" onsubmit="return false;">
+            <input id="city-input" class="form-control search-input" type="search"
+                   placeholder="Search any Indian city… e.g. Delhi, Bengaluru" autocomplete="off" />
+            <button class="btn btn-light" id="search-btn" type="button"><i class="bi bi-search"></i></button>
+          </form>
+          <div id="suggestions" class="suggest-box d-none"></div>
+        </div>
       </div>
     </div>
   </nav>

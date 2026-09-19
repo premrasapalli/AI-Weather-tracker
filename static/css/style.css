@@ -65,6 +65,28 @@
 .hourly-item .h-temp { font-weight: 600; font-size: 0.95rem; }
 .hourly-item .h-rain { font-size: 0.72rem; color: var(--accent); }
 
+.clickable { cursor: pointer; transition: transform .12s ease, background .12s ease; }
+.clickable:hover { transform: translateY(-2px); }
+
+/* search suggestion dropdown */
+.suggest-box {
+  position: absolute; top: 100%; left: 0; right: 0; z-index: 1050;
+  background: #0c1b24; border: 1px solid var(--card-border); border-radius: 12px;
+  margin-top: 6px; max-height: 320px; overflow-y: auto; box-shadow: 0 12px 32px rgba(0,0,0,.45);
+}
+.suggest-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,.06); transition: background .1s ease;
+}
+.suggest-item:last-child { border-bottom: none; }
+.suggest-item:hover { background: rgba(56,189,248,.14); }
+.suggest-item .s-ico { font-size: 1.1rem; }
+.suggest-item .s-name { font-weight: 600; font-size: .92rem; }
+.suggest-item .s-sub { font-size: .75rem; color: var(--text-muted); }
+
+.daily-card { cursor: pointer; transition: transform .12s ease, box-shadow .12s ease; }
+.daily-card:hover { transform: translateY(-3px); box-shadow: 0 10px 26px rgba(0,0,0,.3); }
+
 .daily-card {
   background: var(--card-glass); border: 1px solid var(--card-border);
   border-radius: 14px; padding: 12px 8px; text-align: center; height: 100%;

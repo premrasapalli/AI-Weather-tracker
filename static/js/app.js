@@ -118,12 +118,18 @@ function renderAlerts(alerts) {
 }
 
 function renderHourly(hours) {
-  $("hourly-row").innerHTML = hours.map((h) => `
-    <div class="hourly-item">
+  $("hourly-row").innerHTML = hours.map((h, i) => `
+    <div class="hourly-item clickable" title="Ask AI about ${escapeHtml(h.day)} ${escapeHtml(h.time)}" onclick="askAboutHour('${escapeHtml(h.label || h.time)}')">
       <div class="h-time">${escapeHtml(h.day)} ${escapeHtml(h.time)}</div>
       <div class="h-temp">${Math.round(h.temp)}°</div>
       <div class="h-rain">${(h.precip_prob ?? 0) > 0 ? "💧" + h.precip_prob + "%" : "&nbsp;"}</div>
     </div>`).join("");
+}
+
+function askAboutHour(label) {
+  const q = `What will the weather be like at ${label} today in ${CURRENT_BUNDLE.city}?`;
+  $("chat-input").value = q;
+  sendQuestion();
 }
 
 function renderDaily(days) {
@@ -131,9 +137,10 @@ function renderDaily(days) {
     const dt = new Date(d.date);
     const dateStr = dt.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
     const rain = (d.precip_prob ?? 0) > 0 ? `<div class="d-rain">💧 ${d.precip_prob}%</div>` : "";
+    const dayQ = dt.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" });
     return `
       <div class="col-6 col-md-3 col-lg-2">
-        <div class="daily-card">
+        <div class="daily-card" onclick="askAboutDay('${escapeHtml(dayQ)}')" title="Ask AI about this day">
           <div class="d-day">${dt.toLocaleDateString("en-IN", { weekday: "short" })}</div>
           <div class="d-date">${dateStr}</div>
           <div class="d-icon mt-1">${d.icon}</div>
@@ -143,6 +150,12 @@ function renderDaily(days) {
         </div>
       </div>`;
   }).join("");
+}
+
+function askAboutDay(day) {
+  const q = `What is the weather forecast for ${day} in ${CURRENT_BUNDLE.city}?`;
+  $("chat-input").value = q;
+  sendQuestion();
 }
 
 function renderFeatured() {
@@ -175,30 +188,59 @@ async function sendQuestion() {
   log.scrollTop = log.scrollHeight;
 }
 
-/* autocomplete */
+/* autocomplete with clickable options */
 let debounceId = null;
+let selectedFromList = false;
+const $suggest = () => $("suggestions");
+
+function renderSuggestions(results) {
+  const box = $suggest();
+  if (!results.length) { box.classList.add("d-none"); box.innerHTML = ""; return; }
+  box.classList.remove("d-none");
+  box.innerHTML = results.map((r, i) => `
+    <div class="suggest-item" data-i="${i}">
+      <span class="s-ico">📍</span>
+      <div><div class="s-name">${escapeHtml(r.name)}</div>
+      <div class="s-sub">${escapeHtml([r.state, r.country_code].filter(Boolean).join(" · "))}</div></div>
+    </div>`).join("");
+  box.querySelectorAll(".suggest-item").forEach((el) => {
+    el.addEventListener("click", () => {
+      const r = results[parseInt(el.dataset.i, 10)];
+      selectedFromList = true;
+      $("city-input").value = r.name;
+      hideSuggestions();
+      loadCity(r.name);
+    });
+  });
+}
+
+function hideSuggestions() { $suggest().classList.add("d-none"); $suggest().innerHTML = ""; }
+
 $("city-input").addEventListener("input", (e) => {
   clearTimeout(debounceId);
   const q = e.target.value.trim();
-  if (q.length < 2) return;
+  selectedFromList = false;
+  if (q.length < 2) { hideSuggestions(); return; }
   debounceId = setTimeout(async () => {
     try {
       const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
       const data = await res.json();
-      if (!(data.success && data.results.length)) return;
-      const first = data.results[0];
-      $("city-input").setAttribute("data-hit", first.name);
-      if (first.name.toLowerCase() === q.toLowerCase()) { loadCity(first.name); }
-    } catch (_) { /* ignore */ }
-  }, 450);
+      renderSuggestions(data.success ? data.results : []);
+    } catch (_) { hideSuggestions(); }
+  }, 300);
+});
+document.addEventListener("click", (e) => {
+  if (!e.target.closest("#suggestions") && !e.target.closest("#city-input")) hideSuggestions();
 });
 
 $("search-btn").addEventListener("click", () => {
+  hideSuggestions();
   const v = $("city-input").value.trim();
   if (v) loadCity(v);
 });
 $("city-input").addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
+    hideSuggestions();
     const v = e.target.value.trim();
     if (v) loadCity(v);
   }
