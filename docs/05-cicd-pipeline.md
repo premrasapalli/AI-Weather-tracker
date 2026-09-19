@@ -1,8 +1,9 @@
 # 05 — CI/CD Pipeline (Advanced)
 
 > This document explains how the project is continuously tested and shipped
-> (Continous Integration / Continuous Deployment) — with exact commands you can
-> run and, if you want, a GitHub Actions recipe to automate it fully.
+> (Continuous Integration / Continuous Deployment). The GitHub Actions
+> workflows described here are **already implemented and running** in this repo
+> (see `.github/workflows/ci.yml` and `.github/workflows/cd.yml`).
 
 ## What is CI/CD?
 
@@ -11,19 +12,24 @@
 - **Continuous Deployment (CD):** every pushed change to the main branch is
   automatically built and published to production.
 
-For this project, deployment is **Render auto-deploy** (CD is already live: push
-to `main` → Render rebuilds → new app is public). CI (automated tests) is ready
-to run; the recipe below wires it into GitHub Actions.
+For this project, deployment is **two-layered and live**:
+1. **CI on every push/PR** (`ci.yml`) — lint, format, 3-version test matrix with
+   a coverage gate, security scans (bandit + TruffleHog + secret-file scan), and
+   a Docker build with a container smoke test.
+2. **CD on every push to `main`** (`cd.yml`) — builds and pushes the image to
+   **GHCR**, then triggers a **Render deploy webhook** so production updates the
+   instant CI is green.
 
 ## What we test (the test suite)
 
-`tests/` contains 18 pytest tests, split into three files:
+`tests/` contains 38 pytest tests, split across four files:
 
 | File | Covers |
 |------|--------|
 | `test_api.py` | HTTP API endpoints (search, weather, ask, errors) using a mocked flask test client |
 | `test_insights.py` | The rule engine: AQI categories, alerts, briefings, fallback answers |
 | `test_weather.py` | The data services: geocoding, forecast, air quality, caching, retries |
+| `test_llm_fallback.py` | LLM fallback branches, cache TTL/LRU, HTTP retry behaviour (coverage booster) |
 
 The tests use **mocks** — they do NOT call the real internet. That means CI is
 fast, deterministic, and works offline.
@@ -34,11 +40,12 @@ Run locally:
 .venv/bin/python -m pytest -q
 ```
 
-Expected: `18 passed`.
+Expected: `38 passed`.
 
-## CI pipeline steps (GitHub Actions recipe)
+## CI pipeline steps (GitHub Actions — live in `.github/workflows/ci.yml`)
 
-Create `.github/workflows/ci.yml`:
+The workflow runs four independent jobs (simplified below for reading; the file
+in the repo is authoritative):
 
 ```yaml
 name: CI
@@ -77,7 +84,7 @@ What this does:
 
 1. Triggers on every push/PR to `main`.
 2. Tests against Python 3.10, 3.11, AND 3.12 (a version matrix).
-3. Installs deps, runs the 18-test suite, and confirms the app object imports.
+3. Installs deps, runs the 38-test suite, and confirms the app object imports.
 
 ## A simple build stage (optional)
 
@@ -151,13 +158,19 @@ Then Render can deploy from the registry instead of from the Dockerfile.
 - `git commit` messages are short and descriptive (e.g. `Theme: switch to
   orange font colors, light-green LLM badge`).
 - Secrets never enter commits — GitHub push-protection will actually REJECT a
-  push containing a key (just fix the commit and re-push).
+  push containing a key (resolve via `git rm --cached` + `--amend`, then re-push).
 - Keep `requirements*.txt` pinned to exact versions for reproducible builds.
+- All GitHub Actions use pinned/semver action versions and minimal `permissions`
+  (read-only where possible) to reduce supply-chain risk.
 
 ## Summary
 
-- CI: 18 tests, hermetic, no secrets, multi-Python matrix.
-- CD: Render auto-deploy on push to main.
-- Optional: GH Actions recipe above automates CI and image builds for you.
+- CI (live): ruff lint + format, tests on Python 3.10/3.11/3.12 with a **80%
+  coverage gate**, security scans (bandit, TruffleHog, secret-file check), Docker
+  build + smoke test. Currently **38 tests passed**, coverage **87%**.
+- CD (live): Docker image → GHCR (latest + branch + SHA tags), then Render
+  deploy via the `RENDER_DEPLOY_HOOK_URL` secret.
+- The rendered pipeline and its recovered failures are documented in
+  `docs/07-troubleshooting.md` §§11–13.
 
 Next: a guided tour of the code — **06 Implementation Guide**.

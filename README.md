@@ -30,7 +30,7 @@ optional LLM-powered AI assistant for natural-language questions.
 | HTTP     | httpx (retries + timeout)                        |
 | Data     | Open-Meteo (geocoding, forecast, air quality)    |
 | AI       | Built-in heuristic engine + optional OpenAI-compatible LLM |
-| Tests    | pytest (18 tests)                                |
+| Tests    | pytest (38 tests, 87% coverage gate)              |
 | Infra    | Docker, docker-compose, gunicorn                 |
 
 ## Quickstart (local)
@@ -149,8 +149,8 @@ Flush the in-memory weather cache.
 .venv/bin/python -m pytest -q
 ```
 
-18 tests covering the API, insight engine, and weather services (mocked
-upstreams — no network needed).
+38 tests covering the API, insight engine, LLM fallback, and weather services
+(mocked upstreams — no network needed).
 
 ## Deploy on Render
 
@@ -184,7 +184,7 @@ weathertracker/
     logging_config.py                     # structured logging setup
 templates/                                # Jinja views (index, error)
 static/                                   # CSS/JS (dark orange theme)
-tests/                                    # 18 pytest tests
+tests/                                    # 38 pytest tests
 Dockerfile, docker-compose.yml            # container deploys
 ```
 

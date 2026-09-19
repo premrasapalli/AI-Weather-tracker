@@ -133,7 +133,7 @@ Weather doesn't change every second. The app caches each city's data for
 
 ## A picture of the automated build
 
-The app is small but well-tested: **18 automated tests** (in `tests/`) check the
+The app is small but well-tested: **38 automated tests** (in `tests/`) check the
 kitchen and the waiter so that changes don't break things. Later documents cover
 how those tests run automatically.
 

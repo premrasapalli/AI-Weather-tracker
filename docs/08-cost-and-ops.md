@@ -141,7 +141,7 @@ Open-Meteo on demand. The only things to protect:
 
 1. `git pull` latest.
 2. `pip install -r requirements.txt` (there may be new deps).
-3. Re-run tests: `.venv/bin/python -m pytest -q` → expect `18 passed`.
+3. Re-run tests: `.venv/bin/python -m pytest -q` → expect `38 passed`.
 4. Diff `.env.example` vs `.env` to catch new settings.
 5. Smoke test locally, then push → Render auto-redeploys.
 

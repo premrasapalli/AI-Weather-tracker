@@ -17,7 +17,7 @@ AI-Weather-tracker/
 ├── .gitignore                    # keeps .env, caches, *.swp out of git
 ├── README.md                     # project homepage in the repo
 ├── docs/                         # this documentation series
-├── tests/                        # 18 pytest tests
+├── tests/                        # 38 pytest tests
 │   ├── test_api.py
 │   ├── test_insights.py
 │   └── test_weather.py
