@@ -109,7 +109,7 @@ def get_weather_bundle(city: str, india_only: bool = True) -> dict:
         "today_min": today.get("tmin"),
         "sunrise": today.get("sunrise"),
         "sunset": today.get("sunset"),
-        "forecast": {"today_rain": today.get("precip_prob")},
+        "forecast": {"today_rain": today.get("precip_prob"), "days": daily},
         "txn": datetime.now(timezone.utc).isoformat(),
     }
 

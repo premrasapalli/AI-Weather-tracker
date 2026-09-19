@@ -172,18 +172,20 @@ async function sendQuestion() {
   const q = input.value.trim();
   if (!q || !CURRENT_BUNDLE) return;
   input.value = "";
+  input.disabled = false;
   const log = $("chat-log");
   log.insertAdjacentHTML("beforeend", `<div class="chat-bubble chat-user">${escapeHtml(q)}</div>`);
-  const aiBubble = `<div class="chat-bubble chat-ai"><span class="spinner-border spinner-border-sm"></span> thinking…</div>`;
-  log.insertAdjacentHTML("beforeend", aiBubble);
+  const aiBubble = document.createElement("div");
+  aiBubble.className = "chat-bubble chat-ai";
+  aiBubble.innerHTML = `<span class="spinner-border spinner-border-sm"></span> thinking…`;
+  log.appendChild(aiBubble);
+  log.scrollTop = log.scrollHeight;
   try {
     const res = await fetch(`/api/ask/${encodeURIComponent(CURRENT_BUNDLE.city)}?q=${encodeURIComponent(q)}`);
     const data = await res.json();
-    log.querySelector(".chat-ai:last-child").outerHTML =
-      `<div class="chat-bubble chat-ai">${escapeHtml(data.answer || data.error || "No answer")}</div>`;
+    aiBubble.outerHTML = `<div class="chat-bubble chat-ai">${escapeHtml(data.answer || data.error || "No answer")}</div>`;
   } catch (e) {
-    log.querySelector(".chat-ai:last-child").outerHTML =
-      `<div class="chat-bubble chat-ai">Oops — ${escapeHtml(e.message)}</div>`;
+    aiBubble.outerHTML = `<div class="chat-bubble chat-ai">Oops — ${escapeHtml(e.message)}</div>`;
   }
   log.scrollTop = log.scrollHeight;
 }

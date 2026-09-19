@@ -119,6 +119,12 @@ def test_ask_api_rule_fallback(client):
     assert "°C" in body["answer"] or "hot" in body["answer"].lower()
 
 
+def test_ask_api_tomorrow(client):
+    resp = client.get("/api/ask/Delhi?q=what%20about%20tomorrow")
+    assert resp.status_code == 200
+    assert resp.get_json()["answer"]
+
+
 def test_index_renders(client):
     resp = client.get("/")
     assert resp.status_code == 200
