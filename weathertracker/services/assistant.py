@@ -1,6 +1,6 @@
 """City weather assistant: composes geo + forecast + air quality + AI insights."""
 
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 from weathertracker.services.geocoding import lookup_city
 from weathertracker.services.insights import InsightGenerator, describe_wmo
@@ -122,7 +122,7 @@ def get_weather_bundle(city: str, india_only: bool = True) -> dict:
         "sunrise": today.get("sunrise"),
         "sunset": today.get("sunset"),
         "forecast": {"today_rain": today.get("precip_prob"), "days": daily},
-        "txn": datetime.now(UTC).isoformat(),
+        "txn": datetime.now(timezone.utc).isoformat(),
     }
 
     return {
@@ -138,7 +138,7 @@ def get_weather_bundle(city: str, india_only: bool = True) -> dict:
         "daily": daily,
         "context": context,
         "source": "Open-Meteo (free) + AI engine",
-        "served_at": datetime.now(UTC).isoformat(),
+        "served_at": datetime.now(timezone.utc).isoformat(),
     }
 
 
