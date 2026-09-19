@@ -1,4 +1,4 @@
-from app.utils.http_client import get_json
+from weathertracker.utils.http_client import get_json
 
 
 class LocationResult:

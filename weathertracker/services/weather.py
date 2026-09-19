@@ -1,5 +1,5 @@
-from app.utils.http_client import get_json
-from app.utils.cache import TTLCache
+from weathertracker.utils.http_client import get_json
+from weathertracker.utils.cache import TTLCache
 
 _cache = TTLCache(ttl_seconds=300)
 _current_fields = (

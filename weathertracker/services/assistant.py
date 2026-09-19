@@ -2,10 +2,10 @@
 
 from datetime import datetime, timezone
 
-from app.services.geocoding import lookup_city
-from app.services.insights import InsightGenerator, describe_wmo
-from app.services.llm import LLMClient, enrich_briefing, answer_question
-from app.services.weather import fetch_forecast, fetch_air_quality
+from weathertracker.services.geocoding import lookup_city
+from weathertracker.services.insights import InsightGenerator, describe_wmo
+from weathertracker.services.llm import LLMClient, enrich_briefing, answer_question
+from weathertracker.services.weather import fetch_forecast, fetch_air_quality
 
 
 class CityServiceError(Exception):
@@ -172,6 +172,6 @@ def _compose_briefing(city, conditions, today, aqi, daily) -> str:
 
 
 def get_city_list() -> list[str]:
-    from app.config import Config
+    from weathertracker.config import Config
 
     return [c for c in Config.FEATURED_CITIES]

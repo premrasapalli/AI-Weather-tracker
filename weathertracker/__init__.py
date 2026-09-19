@@ -2,10 +2,10 @@ import os
 
 from flask import Flask, jsonify, render_template, request
 
-from app.config import Config
-from app.services.llm import LLMClient
-from app.services.assistant import CityServiceError
-from app.utils.logging_config import setup_logging
+from weathertracker.config import Config
+from weathertracker.services.llm import LLMClient
+from weathertracker.services.assistant import CityServiceError
+from weathertracker.utils.logging_config import setup_logging
 
 
 def create_app(config: Config | None = None) -> Flask:
@@ -26,7 +26,7 @@ def create_app(config: Config | None = None) -> Flask:
     )
     app.extensions["llm"] = llm
 
-    from app.web import api_bp, page_bp
+    from weathertracker.web import api_bp, page_bp
 
     app.register_blueprint(page_bp)
     app.register_blueprint(api_bp)

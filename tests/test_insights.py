@@ -1,6 +1,6 @@
 import pytest
 
-from app.services.insights import InsightGenerator, describe_wmo
+from weathertracker.services.insights import InsightGenerator, describe_wmo
 
 
 @pytest.fixture()

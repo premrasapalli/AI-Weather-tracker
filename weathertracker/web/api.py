@@ -1,8 +1,8 @@
 from flask import Blueprint, jsonify, request
 
-from app.services.geocoding import search_cities
-from app.services.assistant import ask_city, get_weather_bundle
-from app.services.weather import clear_cache
+from weathertracker.services.geocoding import search_cities
+from weathertracker.services.assistant import ask_city, get_weather_bundle
+from weathertracker.services.weather import clear_cache
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 

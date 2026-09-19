@@ -1,9 +1,9 @@
 import pytest
 
-import app.services.geocoding as geocoding_mod
-import app.services.weather as weather_mod
-import app.services.assistant as assistant_mod
-from app import create_app
+import weathertracker.services.geocoding as geocoding_mod
+import weathertracker.services.weather as weather_mod
+import weathertracker.services.assistant as assistant_mod
+from weathertracker import create_app
 
 GEO = [
     {
