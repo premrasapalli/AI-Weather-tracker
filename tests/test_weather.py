@@ -1,7 +1,6 @@
 import pytest
-
 import weathertracker.services.weather as weather_mod
-from weathertracker.services.weather import fetch_forecast, fetch_air_quality
+from weathertracker.services.weather import fetch_air_quality, fetch_forecast
 
 
 @pytest.fixture(autouse=True)

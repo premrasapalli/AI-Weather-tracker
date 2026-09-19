@@ -66,7 +66,9 @@ def enrich_briefing(llm: LLMClient, context: dict, briefing: str) -> str:
         f"Vehicle: {briefing}\nWrite a tighter, more natural version."
     )
     try:
-        return llm.chat([{"role": "system", "content": system}, {"role": "user", "content": user}]).strip()
+        return llm.chat(
+            [{"role": "system", "content": system}, {"role": "user", "content": user}]
+        ).strip()
     except Exception as exc:  # noqa: BLE001
         logger.warning("LLM enrichment failed, using engine briefing: %s", exc)
         return briefing
@@ -112,7 +114,6 @@ def _fallback_answer(question: str, ctx: dict) -> str:
     q = question.lower()
     city = ctx.get("city")
     days = (ctx.get("forecast") or {}).get("days") or []
-    today = days[0] if days else {}
 
     # 7-day outlook
     if "week" in q or "next" in q or "forecast" in q:
@@ -164,7 +165,19 @@ def _fallback_answer(question: str, ctx: dict) -> str:
         aqi = ctx.get("aqi")
         if aqi is None:
             return "Air quality data is not available right now for this city."
-        level = "Good" if aqi <= 50 else "Satisfactory" if aqi <= 100 else "Moderate" if aqi <= 200 else "Poor" if aqi <= 300 else "Very Poor" if aqi <= 400 else "Severe"
+        level = (
+            "Good"
+            if aqi <= 50
+            else "Satisfactory"
+            if aqi <= 100
+            else "Moderate"
+            if aqi <= 200
+            else "Poor"
+            if aqi <= 300
+            else "Very Poor"
+            if aqi <= 400
+            else "Severe"
+        )
         return f"Air quality in {city} is {level} (AQI {aqi}). {'Limit outdoor exercise.' if aqi > 200 else 'Generally fine for normal activity.'}"
     if "hot" in q or "temp" in q or "warm" in q:
         return (

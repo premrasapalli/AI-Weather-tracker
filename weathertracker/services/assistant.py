@@ -1,11 +1,11 @@
 """City weather assistant: composes geo + forecast + air quality + AI insights."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from weathertracker.services.geocoding import lookup_city
 from weathertracker.services.insights import InsightGenerator, describe_wmo
-from weathertracker.services.llm import LLMClient, enrich_briefing, answer_question
-from weathertracker.services.weather import fetch_forecast, fetch_air_quality
+from weathertracker.services.llm import LLMClient, answer_question, enrich_briefing
+from weathertracker.services.weather import fetch_air_quality, fetch_forecast
 
 
 class CityServiceError(Exception):
@@ -50,7 +50,7 @@ def get_weather_bundle(city: str, india_only: bool = True) -> dict:
     hourly_raw = data.get("hourly", {})
     daily_raw = data.get("daily", {})
 
-    engine = InsightGenerator(seed=hash((loc.name)))
+    engine = InsightGenerator(seed=hash(loc.name))
     conditions = engine.current_conditions(current_raw)
 
     # Build forecast structure
@@ -74,7 +74,19 @@ def get_weather_bundle(city: str, india_only: bool = True) -> dict:
             }
         )
 
-    pollutants = {k: v for k, v in current_raw.items() if k in ("pm2_5", "pm10", "ozone", "nitrogen_dioxide", "sulphur_dioxide", "carbon_monoxide")}
+    pollutants = {
+        k: v
+        for k, v in current_raw.items()
+        if k
+        in (
+            "pm2_5",
+            "pm10",
+            "ozone",
+            "nitrogen_dioxide",
+            "sulphur_dioxide",
+            "carbon_monoxide",
+        )
+    }
     # AQI comes from the air-quality endpoint, not the forecast endpoint
     aq_current = aq_raw.get("current", {}) if aq_raw else {}
     if "us_aqi" in aq_current:
@@ -110,7 +122,7 @@ def get_weather_bundle(city: str, india_only: bool = True) -> dict:
         "sunrise": today.get("sunrise"),
         "sunset": today.get("sunset"),
         "forecast": {"today_rain": today.get("precip_prob"), "days": daily},
-        "txn": datetime.now(timezone.utc).isoformat(),
+        "txn": datetime.now(UTC).isoformat(),
     }
 
     return {
@@ -126,7 +138,7 @@ def get_weather_bundle(city: str, india_only: bool = True) -> dict:
         "daily": daily,
         "context": context,
         "source": "Open-Meteo (free) + AI engine",
-        "served_at": datetime.now(timezone.utc).isoformat(),
+        "served_at": datetime.now(UTC).isoformat(),
     }
 
 
@@ -150,7 +162,11 @@ def _compose_briefing(city, conditions, today, aqi, daily) -> str:
     else:
         sky_desc = condition.lower()
     parts.append(f"In {city} the sky is {sky_desc}")
-    feels = f"feels like {conditions['feels_like_c']}°C" if conditions["feels_like_c"] != conditions["temp_c"] else f"{conditions['temp_c']}°C"
+    feels = (
+        f"feels like {conditions['feels_like_c']}°C"
+        if conditions["feels_like_c"] != conditions["temp_c"]
+        else f"{conditions['temp_c']}°C"
+    )
     parts.append(f"temperature around {feels}")
     parts.append(f"humidity at {conditions['humidity_pct']}%")
     if conditions["wind_kmh"] >= 20:
@@ -167,11 +183,13 @@ def _compose_briefing(city, conditions, today, aqi, daily) -> str:
     sentence = ", and ".join(parts) + "."
     if daily and len(daily) > 1:
         warmest = max(daily, key=lambda d: d["tmax"])
-        sentence += f" The warmest day ahead is {warmest['date']} at {warmest['tmax']}°C."
+        sentence += (
+            f" The warmest day ahead is {warmest['date']} at {warmest['tmax']}°C."
+        )
     return sentence
 
 
 def get_city_list() -> list[str]:
     from weathertracker.config import Config
 
-    return [c for c in Config.FEATURED_CITIES]
+    return list(Config.FEATURED_CITIES)

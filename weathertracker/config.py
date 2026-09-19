@@ -25,9 +25,13 @@ class Config:
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
     # Open-Meteo endpoints (100% free, no API key required)
-    GEOCODE_URL = os.getenv("GEOCODE_URL", "https://geocoding-api.open-meteo.com/v1/search")
+    GEOCODE_URL = os.getenv(
+        "GEOCODE_URL", "https://geocoding-api.open-meteo.com/v1/search"
+    )
     FORECAST_URL = os.getenv("FORECAST_URL", "https://api.open-meteo.com/v1/forecast")
-    AIR_QUALITY_URL = os.getenv("AIR_QUALITY_URL", "https://air-quality-api.open-meteo.com/v1/air-quality")
+    AIR_QUALITY_URL = os.getenv(
+        "AIR_QUALITY_URL", "https://air-quality-api.open-meteo.com/v1/air-quality"
+    )
 
     # Request tuning
     HTTP_TIMEOUT = float(os.getenv("HTTP_TIMEOUT", "10"))

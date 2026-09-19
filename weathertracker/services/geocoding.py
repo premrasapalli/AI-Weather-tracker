@@ -2,7 +2,9 @@ from weathertracker.utils.http_client import get_json
 
 
 class LocationResult:
-    def __init__(self, name, admin1, country_code, latitude, longitude, timezone, raw=None):
+    def __init__(
+        self, name, admin1, country_code, latitude, longitude, timezone, raw=None
+    ):
         self.name = name
         self.admin1 = admin1
         self.country_code = country_code

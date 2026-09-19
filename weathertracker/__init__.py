@@ -41,7 +41,9 @@ def register_error_handlers(app: Flask) -> None:
     def handle_city_error(exc):
         if request.path.startswith("/api/"):
             return jsonify({"error": str(exc), "success": False}), exc.status_code
-        return render_template("error.html", code=exc.status_code, message=str(exc)), exc.status_code
+        return render_template(
+            "error.html", code=exc.status_code, message=str(exc)
+        ), exc.status_code
 
     @app.errorhandler(404)
     def not_found(_):
@@ -53,7 +55,9 @@ def register_error_handlers(app: Flask) -> None:
     def server_error(_):
         if request.path.startswith("/api/"):
             return jsonify({"error": "Internal server error", "success": False}), 500
-        return render_template("error.html", code=500, message="Something went wrong"), 500
+        return render_template(
+            "error.html", code=500, message="Something went wrong"
+        ), 500
 
 
 def register_template_helpers(app: Flask) -> None:

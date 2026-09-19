@@ -47,7 +47,7 @@ class InsightGenerator:
     advisories for Indian conditions without any paid API."""
 
     def __init__(self, seed: int | None = None):
-        self._rng = random.Random(seed)
+        self._rng = random.Random(seed)  # noqa: S311 - deterministic engine seed, not cryptographic
 
     def _sun_icon(self, code: int, is_day: bool) -> str:
         if code in (0, 1):
@@ -118,33 +118,111 @@ class InsightGenerator:
         alerts = []
         temp = conditions["temp_c"]
         if temp >= 45.0:
-            alerts.append({"level": "severe", "type": "Extreme heat", "message": f"{temp}°C — life-threatening heat. Avoid outdoor work 11am–4pm."})
+            alerts.append(
+                {
+                    "level": "severe",
+                    "type": "Extreme heat",
+                    "message": f"{temp}°C — life-threatening heat. Avoid outdoor work 11am–4pm.",
+                }
+            )
         elif temp >= 40.0:
-            alerts.append({"level": "high", "type": "Heatwave", "message": f"{temp}°C — extreme heat. Stay hydrated and indoors during midday."})
+            alerts.append(
+                {
+                    "level": "high",
+                    "type": "Heatwave",
+                    "message": f"{temp}°C — extreme heat. Stay hydrated and indoors during midday.",
+                }
+            )
         elif temp >= 36.0:
-            alerts.append({"level": "advisory", "type": "Hot day", "message": f"Temperature touching {temp}°C — take heat precautions."})
+            alerts.append(
+                {
+                    "level": "advisory",
+                    "type": "Hot day",
+                    "message": f"Temperature touching {temp}°C — take heat precautions.",
+                }
+            )
         if conditions["feels_like_c"] - temp > 3:
-            alerts.append({"level": "advisory", "type": "Humid heat", "message": "Feels noticeably hotter than the actual temperature."})
+            alerts.append(
+                {
+                    "level": "advisory",
+                    "type": "Humid heat",
+                    "message": "Feels noticeably hotter than the actual temperature.",
+                }
+            )
         if conditions["wind_kmh"] >= 60:
-            alerts.append({"level": "high", "type": "High wind", "message": f"Winds near {conditions['wind_kmh']} km/h — secure loose objects."})
-        max_uv = max((d.get("uv_index_max") or 0 for d in daily), default=0) if daily else 0
+            alerts.append(
+                {
+                    "level": "high",
+                    "type": "High wind",
+                    "message": f"Winds near {conditions['wind_kmh']} km/h — secure loose objects.",
+                }
+            )
+        max_uv = (
+            max((d.get("uv_index_max") or 0 for d in daily), default=0) if daily else 0
+        )
         if max_uv >= 11:
-            alerts.append({"level": "high", "type": "Extreme UV", "message": "Extreme UV today — use SPF 50+, avoid noon sun."})
+            alerts.append(
+                {
+                    "level": "high",
+                    "type": "Extreme UV",
+                    "message": "Extreme UV today — use SPF 50+, avoid noon sun.",
+                }
+            )
         elif max_uv >= 8:
-            alerts.append({"level": "advisory", "type": "High UV", "message": "Strong UV today — protect skin and eyes."})
+            alerts.append(
+                {
+                    "level": "advisory",
+                    "type": "High UV",
+                    "message": "Strong UV today — protect skin and eyes.",
+                }
+            )
         rain_day = daily[0] if daily else {}
-        if (rain_day.get("precipitation_probability_max") or 0) >= 70 and (rain_day.get("precipitation_sum") or 0) >= 15:
-            alerts.append({"level": "high", "type": "Heavy rain", "message": "Likely heavy rain — carry an umbrella and drive carefully."})
+        if (rain_day.get("precipitation_probability_max") or 0) >= 70 and (
+            rain_day.get("precipitation_sum") or 0
+        ) >= 15:
+            alerts.append(
+                {
+                    "level": "high",
+                    "type": "Heavy rain",
+                    "message": "Likely heavy rain — carry an umbrella and drive carefully.",
+                }
+            )
         codes_today = []
         if daily:
             codes_today.append(daily[0].get("weather_code"))
         if any(c in (95, 96, 99) for c in codes_today):
-            alerts.append({"level": "severe", "type": "Thunderstorm", "message": "Thunderstorm expected — stay indoors, unplug electronics."})
+            alerts.append(
+                {
+                    "level": "severe",
+                    "type": "Thunderstorm",
+                    "message": "Thunderstorm expected — stay indoors, unplug electronics.",
+                }
+            )
         if conditions["condition"] in ("Fog", "Depositing rime fog"):
-            alerts.append({"level": "advisory", "type": "Fog / low visibility", "message": "Reduced visibility — drive with fog lamps."})
+            alerts.append(
+                {
+                    "level": "advisory",
+                    "type": "Fog / low visibility",
+                    "message": "Reduced visibility — drive with fog lamps.",
+                }
+            )
         if aqi and aqi > 300:
-            alerts.append({"level": "severe", "type": "Hazardous air", "message": "Air is hazardous — limit outdoor exposure, use N95 masks."})
+            alerts.append(
+                {
+                    "level": "severe",
+                    "type": "Hazardous air",
+                    "message": "Air is hazardous — limit outdoor exposure, use N95 masks.",
+                }
+            )
         elif aqi and aqi > 200:
-            alerts.append({"level": "high", "type": "Very poor air", "message": "Poor air quality — reduce strenuous outdoor activity."})
-        alerts.sort(key=lambda a: {"severe": 0, "high": 1, "advisory": 2}.get(a["level"], 3))
+            alerts.append(
+                {
+                    "level": "high",
+                    "type": "Very poor air",
+                    "message": "Poor air quality — reduce strenuous outdoor activity.",
+                }
+            )
+        alerts.sort(
+            key=lambda a: {"severe": 0, "high": 1, "advisory": 2}.get(a["level"], 3)
+        )
         return alerts

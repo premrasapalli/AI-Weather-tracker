@@ -1,6 +1,7 @@
-import httpx
-import logging
 import functools
+import logging
+
+import httpx
 
 logger = logging.getLogger(__name__)
 

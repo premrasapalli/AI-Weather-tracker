@@ -1,8 +1,5 @@
 import pytest
-
-import weathertracker.services.geocoding as geocoding_mod
 import weathertracker.services.weather as weather_mod
-import weathertracker.services.assistant as assistant_mod
 from weathertracker import create_app
 
 GEO = [
@@ -50,7 +47,15 @@ FORECAST = {
 }
 
 AQI = {
-    "current": {"us_aqi": 95, "pm2_5": 38, "pm10": 60, "ozone": 50, "nitrogen_dioxide": 18, "sulphur_dioxide": 8, "carbon_monoxide": 0.4}
+    "current": {
+        "us_aqi": 95,
+        "pm2_5": 38,
+        "pm10": 60,
+        "ozone": 50,
+        "nitrogen_dioxide": 18,
+        "sulphur_dioxide": 8,
+        "carbon_monoxide": 0.4,
+    }
 }
 
 

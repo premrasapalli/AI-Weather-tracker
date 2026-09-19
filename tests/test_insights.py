@@ -1,5 +1,4 @@
 import pytest
-
 from weathertracker.services.insights import InsightGenerator, describe_wmo
 
 
@@ -61,15 +60,39 @@ def test_heat_alert():
         "wind_kmh": 5,
         "condition": "Clear sky",
     }
-    daily = [{"tmax": 46, "tmin": 28, "precipitation_probability_max": 0, "precipitation_sum": 0, "weather_code": 0, "uv_index_max": 9}]
+    daily = [
+        {
+            "tmax": 46,
+            "tmin": 28,
+            "precipitation_probability_max": 0,
+            "precipitation_sum": 0,
+            "weather_code": 0,
+            "uv_index_max": 9,
+        }
+    ]
     alerts = g.promote_alerts(cond, daily, 60)
     assert alerts[0]["type"] == "Extreme heat"
 
 
 def test_rain_alert():
     g = InsightGenerator(seed=1)
-    cond = {"temp_c": 28, "feels_like_c": 28, "humidity_pct": 85, "wind_kmh": 10, "condition": "Overcast"}
-    daily = [{"tmax": 30, "tmin": 24, "precipitation_probability_max": 90, "precipitation_sum": 40, "weather_code": 61, "uv_index_max": 3}]
+    cond = {
+        "temp_c": 28,
+        "feels_like_c": 28,
+        "humidity_pct": 85,
+        "wind_kmh": 10,
+        "condition": "Overcast",
+    }
+    daily = [
+        {
+            "tmax": 30,
+            "tmin": 24,
+            "precipitation_probability_max": 90,
+            "precipitation_sum": 40,
+            "weather_code": 61,
+            "uv_index_max": 3,
+        }
+    ]
     alerts = g.promote_alerts(cond, daily, 80)
     types = [a["type"] for a in alerts]
     assert "Heavy rain" in types

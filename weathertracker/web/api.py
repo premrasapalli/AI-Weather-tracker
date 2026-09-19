@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 
-from weathertracker.services.geocoding import search_cities
 from weathertracker.services.assistant import ask_city, get_weather_bundle
+from weathertracker.services.geocoding import search_cities
 from weathertracker.services.weather import clear_cache
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
@@ -11,7 +11,9 @@ api_bp = Blueprint("api", __name__, url_prefix="/api")
 def search():
     query = (request.args.get("q") or "").strip()
     if len(query) < 2:
-        return jsonify({"success": False, "error": "Query too short", "results": []}), 400
+        return jsonify(
+            {"success": False, "error": "Query too short", "results": []}
+        ), 400
     try:
         results = search_cities(query)
         return jsonify({"success": True, "results": results})
@@ -35,7 +37,14 @@ def ask(city):
     llm = current_app.extensions["llm"]
     bundle = get_weather_bundle(city)
     answer = ask_city(llm, bundle, question)
-    return jsonify({"success": True, "city": bundle["city"], "answer": answer, "llm_enabled": llm.enabled})
+    return jsonify(
+        {
+            "success": True,
+            "city": bundle["city"],
+            "answer": answer,
+            "llm_enabled": llm.enabled,
+        }
+    )
 
 
 @api_bp.route("/cache/clear", methods=["POST"])
